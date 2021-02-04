@@ -1,4 +1,11 @@
 # ship-destroy-day
+Battleship practice project.
+
+Features: 
+- random ship placement using webworker
+- realtime saving game state in localStorage
+- auto marking destroyed ships
+- limited moves mode
 
 ## Project setup
 ```

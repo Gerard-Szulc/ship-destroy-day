@@ -9,7 +9,7 @@
       <div class="button-container">
         <button @click="handleSaveMode" class="primary">Accept</button>
         <button @click="() => $emit('close')" class="primary">Normal Mode</button>
-        <button @click="() => $emit('load')" class="primary">Load game</button>
+        <button v-if="isStateSaved" @click="handleLoadState" class="primary">Load game</button>
       </div>
     </div>
 
@@ -18,11 +18,14 @@
 
 <script>
 
+import localStorageClient from '@/utils/localStorageClient.js'
+
 export default {
   name: 'ModeSelectionModal',
   data () {
     return {
-      movesLimit: 100
+      movesLimit: 100,
+      isStateSaved: false
     }
   },
   props: {
@@ -30,12 +33,25 @@ export default {
       type: Number
     }
   },
+  mounted () {
+    this.isStateSaved = localStorageClient.loadState()
+  },
   methods: {
     handleSaveMode (e) {
       if (e) {
         e.preventDefault()
       }
       this.$emit('limit', this.movesLimit)
+    },
+    handleLoadState (e) {
+      if (e) {
+        e.preventDefault()
+      }
+      if (!localStorageClient.loadState()) {
+        this.$emit('close')
+        return
+      }
+      this.$emit('load')
     }
   }
 }
@@ -79,6 +95,7 @@ export default {
   border-radius: 2px;
   border: 1px solid rgba(1, 1, 1, 0.3);
 }
+
 .button-container {
   display: flex;
   flex-direction: row;

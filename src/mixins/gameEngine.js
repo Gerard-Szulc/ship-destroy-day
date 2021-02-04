@@ -69,7 +69,7 @@ export default {
     },
     getBoard (clean) {
       if (!clean) {
-        const lsData = localStorageClient.retrieveItem('board')
+        const lsData = localStorageClient.loadState()
         if (!lsData) {
           clean = true
         } else {
@@ -146,7 +146,7 @@ export default {
       field.revealed = true
       this.moves++
 
-      localStorageClient.saveItem('board', {
+      localStorageClient.saveState({
         board: this.rows,
         moves: this.moves,
         hitlist: this.hitslist,

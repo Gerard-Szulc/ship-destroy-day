@@ -2,7 +2,7 @@
   <div>
     <nav id="nav" :class="{'opened': menuOpened}" @blur="closeMenu">
       <ul v-if="menuOpened" id="menu-list">
-        <router-link to="/game">
+        <router-link to="/">
           <li @click="closeMenu">
             Game
           </li>
