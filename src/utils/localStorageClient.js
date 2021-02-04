@@ -16,5 +16,8 @@ export default {
       scores = scores.slice(0, 10)
     }
     localStorage.setItem('scores', JSON.stringify(scores))
+  },
+  getHighScores () {
+    return JSON.parse(localStorage.getItem('scores')) || []
   }
 }

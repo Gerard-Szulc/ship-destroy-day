@@ -33,9 +33,10 @@ export default {
 }
 
 .hamburger > div > div {
+  border-radius: 2px;
   height: 5px;
-  background-color: #333;
-  margin: 6px 0;
+  background-color: rgba(7, 113, 221, 0.8);
+  margin: 5px 0;
   transition: 0.3s;
 }
 #topbar {

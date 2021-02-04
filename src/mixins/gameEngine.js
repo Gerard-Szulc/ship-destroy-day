@@ -1,9 +1,14 @@
-// import localStorageClient from '@/utils/localStorageClient.js'
+import localStorageClient from '@/utils/localStorageClient.js'
 
 export default {
   data () {
     return {
-      worker: null
+      worker: null,
+      hitslist: {},
+      battleships: null,
+      loaded: false,
+      moves: 0,
+      rows: null
     }
   },
   beforeDestroy () {
@@ -25,12 +30,6 @@ export default {
       this.worker.onmessage = (message) => {
         this.rows = message.data.rows
         this.loaded = true
-        // localStorageClient.saveItem('board', {
-        //   board: this.rows,
-        //   moves: this.moves,
-        //   hitlist: this.hitslist,
-        //   maxMoves: this.maxMoves
-        // })
       }
       if (!clean) {
         this.loaded = true
@@ -56,6 +55,106 @@ export default {
         })
       }
       this.getBoard(clean)
+    },
+    getBattleShips () {
+      this.battleships = [
+        [Array(4)],
+        [Array(3), Array(3)],
+        [Array(2), Array(2), Array(2)],
+        [Array(1), Array(1), Array(1), Array(1)]
+      ].flat(1).map((el, index) => el.fill({
+        size: el.length,
+        id: index
+      }))
+    },
+    getBoard (clean) {
+      if (!clean) {
+        const lsData = localStorageClient.retrieveItem('board')
+        if (!lsData) {
+          clean = true
+        } else {
+          const {
+            board,
+            moves,
+            hitlist,
+            maxMoves
+
+          } = lsData
+          this.rows = board
+          this.moves = moves
+          this.hitslist = hitlist
+          this.maxMovesOption = maxMoves
+          return
+        }
+
+        clean = true
+      }
+
+      const defaultField = {
+        id: null,
+        shipArea: false,
+        occupied: false,
+        revealed: false
+      }
+      this.rows = Array(this.sizeY).fill('temp').map((row, rowIndex) => {
+        return Array(this.sizeX).fill(defaultField).map((el, index) => ({
+          ...el,
+          rowIndex,
+          colIndex: index
+        }))
+      }, [])
+    },
+    checkDestroyedShips () {
+      return Object.entries(this.hitslist)
+        .filter(([key, value]) => Object.values(value)
+          .every(item => parseInt(item) === parseInt(key)))
+        .map(([key, value]) => Object.values(value))
+        .flat().length === 10
+    },
+    handleFire (field) {
+      if (this.moves >= this.maxMoves) {
+        this.restartGameModalVisible = true
+        return
+      }
+      if (field.revealed) {
+        return
+      }
+      if (this.checkDestroyedShips()) {
+        this.restartGameModalVisible = true
+        return
+      }
+      if (field.occupied) {
+        let subList = {}
+
+        if (!this.hitslist[field.size]) {
+          subList[field.id] = 1
+        } else {
+          subList = this.hitslist[field.size]
+          subList[field.id] = (this.hitslist[field.size][field.id] || 0) + 1
+        }
+        this.$set(this.hitslist, field.size, subList)
+
+        if (this.hitslist[field.size][field.id] === field.size) {
+          this.rows.flat().forEach(scannedField => {
+            if (scannedField.id === field.id) {
+              scannedField.destroyed = true
+            }
+          })
+        }
+      }
+
+      field.revealed = true
+      this.moves++
+
+      localStorageClient.saveItem('board', {
+        board: this.rows,
+        moves: this.moves,
+        hitlist: this.hitslist,
+        maxMoves: this.maxMoves
+      })
+      if (this.checkDestroyedShips()) {
+        this.gameWonModalVisible = true
+      }
     }
   }
 }

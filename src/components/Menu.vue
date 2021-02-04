@@ -1,13 +1,17 @@
 <template>
   <div>
     <nav id="nav" :class="{'opened': menuOpened}" @blur="closeMenu">
-      <ul v-if="menuOpened" class="menu-list">
-        <li @click="closeMenu">
-          <router-link to="/game" >Game</router-link>
-        </li>
-        <li @click="closeMenu">
-          <router-link to="/stats" >Stats</router-link>
-        </li>
+      <ul v-if="menuOpened" id="menu-list">
+        <router-link to="/game">
+          <li @click="closeMenu">
+            Game
+          </li>
+        </router-link>
+
+        <router-link to="/stats">
+          <li @click="closeMenu">Stats</li>
+        </router-link>
+
       </ul>
 
     </nav>
@@ -49,12 +53,12 @@ export default {
 }
 
 #nav a {
-  font-weight: bold;
   color: #2c3e50;
+  text-decoration: none;
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+  color: rgba(7, 113, 221, 0.8);
 }
 
 #nav.opened {
@@ -71,7 +75,6 @@ export default {
 
 .fake-background.opened {
   visibility: visible;
-  /*display: block;*/
   background-color: rgba(7, 7, 7, 0.1);
   top: 0;
   left: 8rem;
@@ -79,7 +82,28 @@ export default {
   height: 100vh;
   position: absolute;
 }
-.menu-list {
+
+#menu-list {
+  width: 100%;
   list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#menu-list li {
+  margin: 2px;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+}
+
+#menu-list li:hover {
+  background-color: #ececec;
+}
+
+#menu-list li:active {
+  background-color: #dbdbdb;
 }
 </style>
