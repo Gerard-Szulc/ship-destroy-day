@@ -39,6 +39,7 @@ export default {
   transition: 0.3s;
 }
 #topbar {
+  z-index: 90;
   box-shadow: 5px 30px 40px -14px #E0E0E0;
   background-color: white;
   position: sticky;

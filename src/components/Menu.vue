@@ -62,6 +62,7 @@ export default {
 }
 
 .fake-background {
+  z-index: 99;
   transition: all 0.3s;
   visibility: hidden;
   width: 100vw;

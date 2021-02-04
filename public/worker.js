@@ -11,7 +11,7 @@ const getStartRow = (maxSizeY) => {
 const getStartColumn = (maxSizeX) => {
   return Math.round(Math.random() * (maxSizeX - 1))
 }
-const getShipArea = ({board, ship, direction, startX, startY}) => board
+const getShipArea = ({ board, ship, direction, startX, startY }) => board
   .filter((row, index) => {
     if (direction === DIRECTION_HORIZONTAL) {
       return index >= startY - 1 && index < (startY + 1)
@@ -31,7 +31,7 @@ const getShipArea = ({board, ship, direction, startX, startY}) => board
     })
   )
 
-const placeAvailable = ({board, ship, direction, startX, startY, maxSizeY, maxSizeX}) => {
+const placeAvailable = ({ board, ship, direction, startX, startY, maxSizeY, maxSizeX }) => {
   if (direction === DIRECTION_HORIZONTAL) {
     if (startX + ship.length > (maxSizeX - 1)) {
       return false
@@ -42,7 +42,7 @@ const placeAvailable = ({board, ship, direction, startX, startY, maxSizeY, maxSi
       return false
     }
   }
-  const area = getShipArea({board, ship, direction, startX, startY})
+  const area = getShipArea({ board, ship, direction, startX, startY })
   return !area.flat().some(field => field.occupied || field.shipArea)
 }
 
@@ -50,11 +50,11 @@ const placeShip = (board, ship, maxSizeY, maxSizeX) => {
   const direction = getDirection()
   const startX = getStartColumn(maxSizeX)
   const startY = getStartRow(maxSizeY)
-  // console.log(`${direction}-${startX}-${startY}-${ship.length}`, cache[`${direction}-${startX}-${startY}-${ship.length}`])
+
   if (cache[`${direction}-${startX}-${startY}-${ship.length}`]) {
     return false
   }
-  const canPlaceShip = placeAvailable({board, ship, direction, startX, startY, maxSizeY, maxSizeX})
+  const canPlaceShip = placeAvailable({ board, ship, direction, startX, startY, maxSizeY, maxSizeX })
   if (canPlaceShip) {
     if (direction === DIRECTION_HORIZONTAL) {
       for (let i = startX; i < startX + ship.length; i++) {
@@ -62,7 +62,6 @@ const placeShip = (board, ship, maxSizeY, maxSizeX) => {
         board[startY][i].size = ship[0].size
         board[startY][i].id = ship[0].id
       }
-      // console.log('bor', getShipArea(board, ship, direction, startX, startY))
     }
     if (direction === DIRECTION_VERTICAL) {
       for (let i = startY; i < startY + ship.length; i++) {
@@ -70,9 +69,8 @@ const placeShip = (board, ship, maxSizeY, maxSizeX) => {
         board[i][startX].size = ship[0].size
         board[i][startX].id = ship[0].id
       }
-      // console.log('bor', getShipArea(board, ship, direction, startX, startY))
     }
-    getShipArea({board, ship, direction, startX, startY}).flat().forEach(field => {
+    getShipArea({ board, ship, direction, startX, startY }).flat().forEach(field => {
       field.shipArea = true
     })
   }
@@ -91,8 +89,8 @@ const handleShipGeneration = (board, ships, maxSizeY, maxSizeX) => {
 
 self.addEventListener('message', (
   { data }) => {
-    cache = {}
-    handleShipGeneration(data.rows, data.battleships, data.maxSizeY, data.maxSizeX)
-    self.postMessage({ rows: data.rows })
-  }
+  cache = {}
+  handleShipGeneration(data.rows, data.battleships, data.maxSizeY, data.maxSizeX)
+  self.postMessage({ rows: data.rows })
+}
 )
