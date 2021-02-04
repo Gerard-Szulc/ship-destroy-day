@@ -6,7 +6,7 @@
         <template
           v-for="(score, index) in scores"
         >
-          <li :key="index"><span :title="`${score.moves} | ${score.name}`">{{score.moves}} | {{score.name}}</span></li>
+          <li :key="index"><span :title="`Score: ${score.moves} | Name: ${score.name}`">{{`Score: ${score.moves} | Name: ${score.name}`}}</span></li>
         </template>
       </ul>
     </div>
@@ -36,7 +36,7 @@ export default {
   justify-content: center;
 }
 #highscore-list > li {
-  width: 10rem;
+  width: 18rem;
   display: flex;
 
 }

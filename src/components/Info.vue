@@ -25,6 +25,21 @@ export default {
   justify-content: center;
   flex-direction: row;
 }
+@media screen and (max-width: 874px) {
+
+  #info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+  }
+  #info .info-field-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: center;
+  }
+}
 .info-field-container {
   width: 15%;
   display: flex;
@@ -33,6 +48,7 @@ export default {
   justify-items: center;
 }
 .board-field {
+  min-width: 32px;
   height: 2rem;
   width: 2rem;
   cursor: default;

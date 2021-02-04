@@ -45,7 +45,7 @@ export default {
   position: relative;
   top: 20%;
   margin: auto auto;
-  width: 30%;
-  height: 30%;
+  width: 20rem;
+  height: 15rem;
 }
 </style>

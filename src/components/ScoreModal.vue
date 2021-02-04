@@ -66,9 +66,8 @@ export default {
   position: relative;
   top: 20%;
   margin: auto auto;
-  /* left: auto; */
-  width: 30%;
-  height: 30%;
+  width: 20rem;
+  height: 15rem;
 }
 .modal-card form {
   display: flex;
