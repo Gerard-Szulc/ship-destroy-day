@@ -6,7 +6,7 @@ export default {
       worker: null,
       hitslist: {},
       battleships: null,
-      loaded: false,
+      m$loaded: false,
       moves: 0,
       rows: null
     }
@@ -16,23 +16,36 @@ export default {
       this.destroyWorker()
     }
   },
+  created () {
+    this.initWorker()
+  },
   methods: {
     destroyWorker () {
       this.worker.terminate()
     },
-    async m$initWorker (clean) {
+    m$startGame (clean, maxMoves = null) {
+      this.maxMovesOption = maxMoves
+      this.hitslist = {}
+      this.moves = 0
+      this.getBoard(clean)
+      this.initWorkerBus(clean)
+      this.modeSelectionModalVisible = false
+    },
+    async initWorker () {
       const data = await fetch(document.querySelector('#worker-script').src)
       const scriptBlob = new Blob(
         [await data.text()],
         { type: 'text/javascript' }
       )
       this.worker = new Worker(window.URL.createObjectURL(scriptBlob))
+    },
+    initWorkerBus (clean) {
       this.worker.onmessage = (message) => {
         this.rows = message.data.rows
-        this.loaded = true
+        this.m$loaded = true
       }
       if (!clean) {
-        this.loaded = true
+        this.m$loaded = true
         return
       }
       this.worker.postMessage({
@@ -41,20 +54,6 @@ export default {
         maxSizeX: this.sizeX,
         maxSizeY: this.sizeY
       })
-    },
-    m$restartGame (clean) {
-      if (clean) {
-        this.hitslist = {}
-        this.moves = 0
-        this.getBoard(clean)
-        this.worker.postMessage({
-          rows: this.rows,
-          battleships: this.battleships,
-          maxSizeX: this.sizeX,
-          maxSizeY: this.sizeY
-        })
-      }
-      this.getBoard(clean)
     },
     getBattleShips () {
       this.battleships = [
@@ -78,7 +77,6 @@ export default {
             moves,
             hitlist,
             maxMoves
-
           } = lsData
           this.rows = board
           this.moves = moves
@@ -111,7 +109,16 @@ export default {
         .map(([key, value]) => Object.values(value))
         .flat().length === 10
     },
-    handleFire (field) {
+    addNewHit (subList, field) {
+      subList[field.id] = 1
+      return subList
+    },
+    addToExistingHit (subList, field) {
+      subList = this.hitslist[field.size]
+      subList[field.id] = (this.hitslist[field.size][field.id] || 0) + 1
+      return subList
+    },
+    m$handleFire (field) {
       if (this.moves >= this.maxMoves) {
         this.restartGameModalVisible = true
         return
@@ -125,13 +132,7 @@ export default {
       }
       if (field.occupied) {
         let subList = {}
-
-        if (!this.hitslist[field.size]) {
-          subList[field.id] = 1
-        } else {
-          subList = this.hitslist[field.size]
-          subList[field.id] = (this.hitslist[field.size][field.id] || 0) + 1
-        }
+        subList = this.hitslist[field.size] ? this.addToExistingHit(subList, field) : this.addNewHit(subList, field)
         this.$set(this.hitslist, field.size, subList)
 
         if (this.hitslist[field.size][field.id] === field.size) {

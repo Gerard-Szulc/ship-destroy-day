@@ -1,17 +1,32 @@
 <template>
   <div>
-    <Modal v-show="gameWonModalVisible" :moves="moves" @close="handleCloseScoreModalVisibility"></Modal>
-    <RestartGameModal v-show="restartGameModalVisible" @confirm="handleNewGame"
-                      @close="() => restartGameModalVisible = false"></RestartGameModal>
-    <ModeSelectionModal v-show="modeSelectionModalVisible" @load="handleLoadSavedState" @limit="handleStartLimitModeGame"
-                        @close="handleStartNormalModeGame"></ModeSelectionModal>
-    <section class="board-container" v-if="loaded">
+    <Modal
+      v-show="gameWonModalVisible"
+      :moves="moves"
+      @close="handleCloseScoreModalVisibility"
+    ></Modal>
+    <RestartGameModal
+      v-show="restartGameModalVisible"
+      @confirm="handleNewGame"
+      @close="() => restartGameModalVisible = false"
+    >
+    </RestartGameModal>
+    <ModeSelectionModal
+      v-show="modeSelectionModalVisible"
+      @load="handleLoadSavedState"
+      @limit="handleStartLimitModeGame"
+      @close="handleStartNormalModeGame"
+    ></ModeSelectionModal>
+    <section
+      v-if="m$loaded"
+      class="board-container"
+    >
       <div class="board">
         <div v-for="(row, key) in rows" :key="`row-${key}`" class="board-row">
           <template v-for="(field, fieldIndex) in row">
             <div :key="`field-${key}-${fieldIndex}`"
                  class="board-field"
-                 @click="() => handleFire(field)"
+                 @click="() => m$handleFire(field)"
                  :class="{
                    'field-hit': field.revealed && field.occupied,
                     'field-empty': !field.occupied && field.revealed,
@@ -26,9 +41,10 @@
       </div>
     </section>
     <Info
-      v-if="loaded"/>
+      v-if="m$loaded"
+    />
     <button
-      v-if="loaded"
+      v-if="m$loaded"
       @click="(e) => handleNewGame(e, true)"
     >Restart
     </button>
@@ -44,6 +60,8 @@ import ModeSelectionModal from '@/components/ModeSelectionModal.vue'
 
 const SIZE_X = 10
 const SIZE_Y = 10
+const START_CLEAN = true
+const START_DIRTY = false
 export default {
   name: 'Game',
   components: {
@@ -80,40 +98,25 @@ export default {
       return this.sizeX * this.sizeY
     }
   },
-  mounted () {
+  created () {
     this.getBattleShips()
   },
   methods: {
-    handleStartLimitModeGame (payload) {
-      this.hitslist = {}
-      this.moves = 0
-      this.maxMovesOption = payload
-      this.getBoard(true)
-      this.m$initWorker(true)
-      this.modeSelectionModalVisible = false
+    handleStartLimitModeGame (maxMoves) {
+      this.m$startGame(START_CLEAN, maxMoves)
     },
     handleStartNormalModeGame () {
-      this.maxMovesOption = null
-      this.hitslist = {}
-      this.moves = 0
-      this.getBoard(true)
-      this.m$initWorker(true)
-      this.modeSelectionModalVisible = false
+      this.m$startGame(START_CLEAN)
     },
     handleLoadSavedState () {
-      this.maxMovesOption = null
-      this.hitslist = {}
-      this.moves = 0
-      this.getBoard(false)
-      this.m$initWorker(false)
-      this.modeSelectionModalVisible = false
+      this.m$startGame(START_DIRTY)
     },
     handleNewGame (e, restart = false) {
       if (e) {
         e.preventDefault()
       }
       if (restart) {
-        this.m$restartGame(true)
+        this.m$startGame(START_CLEAN)
       }
       this.modeSelectionModalVisible = true
     },
